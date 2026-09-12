@@ -1,12 +1,23 @@
 {
+  "id": "/wizard-punkte/",
   "name": "Wizard Punkte",
   "short_name": "Wizard Punkte",
-  "description": "Punkte-App für das Kartenspiel Wizard",
-  "start_url": "./",
-  "display": "standalone",
-  "background_color": "#111827",
-  "theme_color": "#6d28d9",
+  "description": "Punkte und Stiche für das Kartenspiel Wizard",
   "lang": "de-DE",
+  "start_url": "/wizard-punkte/?source=pwa",
+  "scope": "/wizard-punkte/",
+  "display": "standalone",
+  "display_override": [
+    "standalone"
+  ],
+  "orientation": "portrait",
+  "background_color": "#17103a",
+  "theme_color": "#17103a",
+  "prefer_related_applications": false,
+  "categories": [
+    "games",
+    "utilities"
+  ],
   "icons": [
     {
       "src": "icon-192.png",

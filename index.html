@@ -3,8 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#6d28d9">
+<meta name="theme-color" content="#17103a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Wizard Punkte">
+<meta name="application-name" content="Wizard Punkte">
 <link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png" sizes="192x192">
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Wizard Punkte</title>
 <style>
@@ -97,7 +103,7 @@
   <div id="gameOver" class="card winner hidden" style="margin-top:14px"></div>
 </section>
 
-<footer>Wizard Punkte – funktioniert direkt im Browser und speichert den Spielstand auf diesem Gerät.</footer>
+<div id="installBox" class="card hidden" style="position:sticky;bottom:12px;z-index:10;background:#17103a;color:white;border-color:#7c3aed"><div class="row" style="justify-content:space-between"><div><strong>📱 Wizard Punkte installieren</strong><div style="opacity:.8;font-size:.9rem">App auf dem Startbildschirm installieren.</div></div><button id="installBtn" class="primary">Installieren</button></div></div><footer>Wizard Punkte – funktioniert direkt im Browser und speichert den Spielstand auf diesem Gerät.</footer>
 </div>
 
 <script>
@@ -228,5 +234,12 @@ if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(()=>{}));
 }
 </script>
-</body>
+<script>
+let deferredInstallPrompt=null;
+const installBox=document.getElementById("installBox"), installBtn=document.getElementById("installBtn");
+window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredInstallPrompt=e;if(installBox)installBox.classList.remove("hidden")});
+if(installBtn)installBtn.addEventListener("click",async()=>{if(!deferredInstallPrompt)return;deferredInstallPrompt.prompt();await deferredInstallPrompt.userChoice;deferredInstallPrompt=null;installBox.classList.add("hidden")});
+window.addEventListener("appinstalled",()=>{deferredInstallPrompt=null;if(installBox)installBox.classList.add("hidden")});
+if("serviceWorker"in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js",{scope:"./"}).catch(console.error));
+</script></body>
 </html>
