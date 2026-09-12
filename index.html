@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#6d28d9">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Wizard Punkte</title>
+<style>
+  :root { --bg:#f5f3ff; --card:#fff; --text:#1f2937; --muted:#6b7280; --accent:#6d28d9; --accent2:#8b5cf6; --border:#e5e7eb; --danger:#dc2626; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif; background:linear-gradient(135deg,#f5f3ff,#eef2ff); color:var(--text); }
+  .wrap { max-width:1000px; margin:auto; padding:20px; }
+  header { text-align:center; padding:10px 0 18px; }
+  h1 { margin:0; font-size:2rem; }
+  .subtitle { color:var(--muted); margin-top:6px; }
+  .card { background:var(--card); border:1px solid var(--border); border-radius:18px; padding:18px; margin:14px 0; box-shadow:0 8px 25px rgba(31,41,55,.06); }
+  .row { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+  input, button, select { font:inherit; }
+  input[type=text], input[type=number] { width:100%; padding:11px 12px; border:1px solid #d1d5db; border-radius:10px; }
+  button { border:0; border-radius:10px; padding:11px 15px; cursor:pointer; font-weight:650; }
+  .primary { background:var(--accent); color:white; }
+  .secondary { background:#ede9fe; color:#4c1d95; }
+  .danger { background:#fee2e2; color:#991b1b; }
+  .small { padding:8px 10px; font-size:.9rem; }
+  .players { display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:10px; margin-top:12px; }
+  .player-edit { display:flex; gap:7px; align-items:center; }
+  .player-edit input { flex:1; }
+  .hidden { display:none !important; }
+  .round-head { display:flex; justify-content:space-between; gap:10px; align-items:center; flex-wrap:wrap; }
+  .score-grid { overflow-x:auto; }
+  table { width:100%; border-collapse:collapse; min-width:620px; }
+  th,td { padding:10px 8px; border-bottom:1px solid var(--border); text-align:center; }
+  th:first-child,td:first-child { text-align:left; }
+  th { background:#fafafa; position:sticky; top:0; }
+  .entry-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:12px; }
+  .entry { border:1px solid var(--border); border-radius:14px; padding:13px; }
+  .entry strong { display:block; margin-bottom:8px; }
+  .fields { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .hint { color:var(--muted); font-size:.9rem; }
+  .winner { background:#fef3c7; border-color:#f59e0b; }
+  .totals { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; }
+  .total { padding:14px; border-radius:14px; background:#fafafa; border:1px solid var(--border); }
+  .total .name { color:var(--muted); font-size:.9rem; }
+  .total .points { font-size:1.6rem; font-weight:800; margin-top:3px; }
+  footer { text-align:center; color:var(--muted); font-size:.85rem; padding:15px 0 30px; }
+  @media(max-width:600px){ .wrap{padding:12px} h1{font-size:1.65rem} .card{padding:14px} }
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>🧙 Wizard Punkte</h1>
+  <div class="subtitle">Einfach Ansage und Stiche eintragen – die Punkte werden automatisch berechnet.</div>
+</header>
+
+<section class="card" id="setup">
+  <h2>Spieler</h2>
+  <div class="row">
+    <input id="newPlayer" type="text" placeholder="Name des Spielers" style="max-width:360px">
+    <button class="primary" onclick="addPlayer()">Spieler hinzufügen</button>
+  </div>
+  <div id="playerList" class="players"></div>
+  <p class="hint">Normale Wizard-Wertung: richtige Ansage = 20 + 10 Punkte je Stich. Falsche Ansage = −10 Punkte je Stich Abweichung.</p>
+  <button id="startBtn" class="primary" onclick="startGame()" disabled>Spiel starten</button>
+</section>
+
+<section class="card hidden" id="game">
+  <div class="round-head">
+    <div>
+      <h2 id="roundTitle" style="margin:0"></h2>
+      <div class="hint" id="roundHint"></div>
+    </div>
+    <div class="row">
+      <button class="secondary small" onclick="undoRound()">↩ Letzte Runde</button>
+      <button class="danger small" onclick="newGame()">Neues Spiel</button>
+    </div>
+  </div>
+
+  <div class="card" style="margin:14px 0;background:#fafafa">
+    <h3 style="margin-top:0">Runde eintragen</h3>
+    <div id="entries" class="entry-grid"></div>
+    <div class="row" style="margin-top:14px">
+      <button class="primary" onclick="saveRound()">Runde speichern</button>
+    </div>
+  </div>
+
+  <div class="card" style="margin:14px 0">
+    <h3 style="margin-top:0">Gesamtstand</h3>
+    <div id="totals" class="totals"></div>
+  </div>
+
+  <div class="score-grid">
+    <table id="scoreTable"></table>
+  </div>
+  <div id="gameOver" class="card winner hidden" style="margin-top:14px"></div>
+</section>
+
+<footer>Wizard Punkte – funktioniert direkt im Browser und speichert den Spielstand auf diesem Gerät.</footer>
+</div>
+
+<script>
+let state = { players: [], rounds: [], currentRound: 1 };
+
+function load() {
+  try {
+    const saved = localStorage.getItem('wizardScore');
+    if (saved) state = JSON.parse(saved);
+  } catch(e) {}
+  render();
+}
+function persist(){ localStorage.setItem('wizardScore', JSON.stringify(state)); }
+
+function addPlayer() {
+  const input=document.getElementById('newPlayer');
+  const name=input.value.trim();
+  if(!name) return;
+  if(state.players.length>=6){ alert('Wizard kann mit maximal 6 Spielern gespielt werden.'); return; }
+  state.players.push(name);
+  input.value='';
+  renderSetup();
+}
+function removePlayer(i) {
+  if(state.rounds.length){ alert('Während eines Spiels können Spieler nicht entfernt werden. Starte ein neues Spiel.'); return; }
+  state.players.splice(i,1); renderSetup();
+}
+function renderSetup(){
+  const list=document.getElementById('playerList');
+  list.innerHTML=state.players.map((p,i)=>`<div class="player-edit"><input value="${esc(p)}" onchange="renamePlayer(${i},this.value)"><button class="danger small" onclick="removePlayer(${i})">✕</button></div>`).join('');
+  document.getElementById('startBtn').disabled=state.players.length<3 || state.players.length>6;
+}
+function renamePlayer(i,v){ if(v.trim()) state.players[i]=v.trim(); persist(); render(); }
+function maxRounds(){ return Math.floor(60/state.players.length); }
+
+function startGame(){
+  if(state.players.length<3 || state.players.length>6) return;
+  state.rounds=[]; state.currentRound=1; persist(); renderGame();
+}
+function newGame(){
+  if(!confirm('Neues Spiel starten? Der aktuelle Spielstand wird gelöscht.')) return;
+  state={players:[],rounds:[],currentRound:1};
+  persist(); render();
+}
+function score(bid,tricks){
+  const diff=tricks-bid;
+  return diff===0 ? 20 + 10*bid : -10*Math.abs(diff);
+}
+function saveRound(){
+  const r=state.currentRound;
+  const max=r;
+  const values=state.players.map((p,i)=>{
+    const bid=Number(document.getElementById('bid'+i).value);
+    const tricks=Number(document.getElementById('tricks'+i).value);
+    return {bid,tricks,points:score(bid,tricks)};
+  });
+  const totalTricks=values.reduce((a,x)=>a+x.tricks,0);
+  if(values.some(x=>!Number.isInteger(x.bid)||!Number.isInteger(x.tricks)||x.bid<0||x.bid>max||x.tricks<0||x.tricks>max)){
+    alert(`Bitte nur ganze Zahlen von 0 bis ${max} eingeben.`); return;
+  }
+  if(totalTricks!==r){
+    alert(`In Runde ${r} müssen insgesamt genau ${r} Stiche eingetragen werden. Aktuell: ${totalTricks}.`);
+    return;
+  }
+  state.rounds.push(values); state.currentRound++;
+  persist(); renderGame();
+}
+function undoRound(){
+  if(!state.rounds.length){ alert('Es gibt noch keine gespeicherte Runde.'); return; }
+  state.rounds.pop(); state.currentRound=Math.max(1,state.currentRound-1); persist(); renderGame();
+}
+function totals(){
+  return state.players.map((p,i)=>state.rounds.reduce((sum,r)=>sum+r[i].points,0));
+}
+function renderGame(){
+  document.getElementById('setup').classList.add('hidden');
+  document.getElementById('game').classList.remove('hidden');
+  const max=maxRounds();
+  document.getElementById('roundTitle').textContent = state.currentRound<=max ? `Runde ${state.currentRound} von ${max}` : 'Spiel beendet';
+  document.getElementById('roundHint').textContent = state.currentRound<=max ? `In dieser Runde werden ${state.currentRound} Karten/Stiche gespielt.` : 'Alle Runden sind abgeschlossen.';
+  const entries=document.getElementById('entries');
+  if(state.currentRound<=max){
+    entries.innerHTML=state.players.map((p,i)=>`
+      <div class="entry">
+        <strong>${esc(p)}</strong>
+        <div class="fields">
+          <label>Ansage<input id="bid${i}" type="number" min="0" max="${state.currentRound}" value="0"></label>
+          <label>Stiche<input id="tricks${i}" type="number" min="0" max="${state.currentRound}" value="0"></label>
+        </div>
+      </div>`).join('');
+  } else {
+    entries.innerHTML='<p class="hint">Keine weitere Runde vorhanden.</p>';
+  }
+  renderTotals(); renderTable();
+  const over=document.getElementById('gameOver');
+  if(state.currentRound>max){
+    const ts=totals(), best=Math.max(...ts), winners=state.players.filter((p,i)=>ts[i]===best);
+    over.classList.remove('hidden');
+    over.innerHTML=`🏆 <strong>Gewonnen:</strong> ${winners.map(esc).join(' & ')} mit <strong>${best} Punkten</strong>.`;
+  } else over.classList.add('hidden');
+}
+function renderTotals(){
+  const ts=totals(), best=ts.length?Math.max(...ts):0;
+  document.getElementById('totals').innerHTML=state.players.map((p,i)=>`
+    <div class="total ${ts[i]===best&&state.rounds.length?'winner':''}">
+      <div class="name">${esc(p)}</div><div class="points">${ts[i]}</div>
+    </div>`).join('');
+}
+function renderTable(){
+  let html='<thead><tr><th>Runde</th>'+state.players.map(esc).map(p=>`<th>${p}</th>`).join('')+'</tr></thead><tbody>';
+  state.rounds.forEach((r,ri)=>{
+    html+=`<tr><td>${ri+1}</td>`+r.map(x=>`<td>${x.points > 0 ? '+' : ''}${x.points}<br><span class="hint">${x.bid} / ${x.tricks}</span></td>`).join('')+'</tr>';
+  });
+  if(state.rounds.length) html+=`<tr><th>Gesamt</th>${totals().map(x=>`<th>${x}</th>`).join('')}</tr>`;
+  html+='</tbody>';
+  document.getElementById('scoreTable').innerHTML=html;
+}
+function render(){
+  if(state.rounds.length || state.currentRound>1) renderGame();
+  else { document.getElementById('setup').classList.remove('hidden'); document.getElementById('game').classList.add('hidden'); renderSetup(); }
+}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+document.getElementById('newPlayer').addEventListener('keydown',e=>{if(e.key==='Enter')addPlayer();});
+load();
+</script>
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(()=>{}));
+}
+</script>
+</body>
+</html>
