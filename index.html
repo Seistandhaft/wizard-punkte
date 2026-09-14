@@ -1,245 +1,149 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="de">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#17103a">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Wizard Punkte">
-<meta name="application-name" content="Wizard Punkte">
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" href="icon-192.png" sizes="192x192">
-<link rel="apple-touch-icon" href="icon-192.png">
-<title>Wizard Punkte</title>
-<style>
-  :root { --bg:#f5f3ff; --card:#fff; --text:#1f2937; --muted:#6b7280; --accent:#6d28d9; --accent2:#8b5cf6; --border:#e5e7eb; --danger:#dc2626; }
-  * { box-sizing:border-box; }
-  body { margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif; background:linear-gradient(135deg,#f5f3ff,#eef2ff); color:var(--text); }
-  .wrap { max-width:1000px; margin:auto; padding:20px; }
-  header { text-align:center; padding:10px 0 18px; }
-  h1 { margin:0; font-size:2rem; }
-  .subtitle { color:var(--muted); margin-top:6px; }
-  .card { background:var(--card); border:1px solid var(--border); border-radius:18px; padding:18px; margin:14px 0; box-shadow:0 8px 25px rgba(31,41,55,.06); }
-  .row { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
-  input, button, select { font:inherit; }
-  input[type=text], input[type=number] { width:100%; padding:11px 12px; border:1px solid #d1d5db; border-radius:10px; }
-  button { border:0; border-radius:10px; padding:11px 15px; cursor:pointer; font-weight:650; }
-  .primary { background:var(--accent); color:white; }
-  .secondary { background:#ede9fe; color:#4c1d95; }
-  .danger { background:#fee2e2; color:#991b1b; }
-  .small { padding:8px 10px; font-size:.9rem; }
-  .players { display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:10px; margin-top:12px; }
-  .player-edit { display:flex; gap:7px; align-items:center; }
-  .player-edit input { flex:1; }
-  .hidden { display:none !important; }
-  .round-head { display:flex; justify-content:space-between; gap:10px; align-items:center; flex-wrap:wrap; }
-  .score-grid { overflow-x:auto; }
-  table { width:100%; border-collapse:collapse; min-width:620px; }
-  th,td { padding:10px 8px; border-bottom:1px solid var(--border); text-align:center; }
-  th:first-child,td:first-child { text-align:left; }
-  th { background:#fafafa; position:sticky; top:0; }
-  .entry-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:12px; }
-  .entry { border:1px solid var(--border); border-radius:14px; padding:13px; }
-  .entry strong { display:block; margin-bottom:8px; }
-  .fields { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
-  .hint { color:var(--muted); font-size:.9rem; }
-  .winner { background:#fef3c7; border-color:#f59e0b; }
-  .totals { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; }
-  .total { padding:14px; border-radius:14px; background:#fafafa; border:1px solid var(--border); }
-  .total .name { color:var(--muted); font-size:.9rem; }
-  .total .points { font-size:1.6rem; font-weight:800; margin-top:3px; }
-  footer { text-align:center; color:var(--muted); font-size:.85rem; padding:15px 0 30px; }
-  @media(max-width:600px){ .wrap{padding:12px} h1{font-size:1.65rem} .card{padding:14px} }
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#17103a">
+  <meta name="description" content="Wizard Punkte zählen – einfach Ansagen und Stiche eintragen.">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Wizard Punkte">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <title>Wizard Punkte</title>
+  <style>
+    :root{--bg:#0f0b25;--panel:#1b1540;--panel2:#241b52;--text:#fff;--muted:#b9b2d2;--gold:#f6c94a;--gold2:#ffdf7a;--accent:#7658ff;--good:#52d98b;--bad:#ff6b79;--line:#3a3064;--shadow:0 18px 50px rgba(0,0,0,.32)}
+    *{box-sizing:border-box} body{margin:0;background:radial-gradient(circle at 50% -10%,#35216d 0,#17103a 38%,var(--bg) 80%);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;min-height:100vh}
+    button,input{font:inherit} button{cursor:pointer;border:0}.wrap{max-width:760px;margin:0 auto;padding:18px 14px 38px}.hero{text-align:center;padding:18px 8px 14px}.hero .logo{width:78px;height:78px;border-radius:24px;display:block;margin:0 auto 10px;box-shadow:0 10px 30px rgba(0,0,0,.35);object-fit:cover}.hero h1{margin:0;font-size:30px;letter-spacing:-.5px}.hero p{margin:7px 0 0;color:var(--muted);font-size:14px}.card{background:linear-gradient(180deg,rgba(36,27,82,.96),rgba(27,21,64,.96));border:1px solid var(--line);border-radius:22px;padding:18px;margin:12px 0;box-shadow:var(--shadow)}
+    h2{font-size:19px;margin:0 0 14px}.sub{color:var(--muted);font-size:13px;margin-top:-8px;margin-bottom:14px}.row{display:flex;gap:10px}.name-input{flex:1;min-width:0}.input,.num{width:100%;background:#100c2b;color:#fff;border:1px solid #4a3f76;border-radius:13px;padding:12px 13px;outline:none}.input:focus,.num:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(246,201,74,.12)}.input::placeholder,.num::placeholder{color:#777091}.btn{border-radius:13px;padding:11px 15px;font-weight:750;transition:.15s transform,.15s opacity}.btn:active{transform:scale(.98)}.btn.primary{background:linear-gradient(135deg,#f6c94a,#ffdc70);color:#201634}.btn.secondary{background:#33275f;color:#fff;border:1px solid #4a3f76}.btn.danger{background:#43213c;color:#ffd7dc;border:1px solid #6b3453}.btn.install{background:linear-gradient(135deg,#7658ff,#a27cff);color:#fff;width:100%}.players{display:grid;gap:8px;margin-top:13px}.player-row{display:flex;align-items:center;justify-content:space-between;background:#151032;border:1px solid #30275a;border-radius:13px;padding:10px 12px}.player-row .remove{background:transparent;color:#c4bbdf;font-size:18px;padding:3px 7px}.actions{display:grid;gap:9px;margin-top:15px}.actions.two{grid-template-columns:1fr 1fr}.hidden{display:none!important}.round-head{display:flex;justify-content:space-between;gap:10px;align-items:end}.round-badge{color:#201634;background:var(--gold);font-weight:850;border-radius:999px;padding:6px 10px;font-size:12px}.score-table{display:grid;gap:8px}.score-row{display:grid;grid-template-columns:1.35fr .7fr .7fr .8fr;gap:7px;align-items:center;background:#151032;border:1px solid #30275a;border-radius:14px;padding:9px}.score-row.head{background:transparent;border:0;padding:0 4px;color:var(--muted);font-size:11px;text-transform:uppercase}.score-row .pname{font-weight:700;overflow:hidden;text-overflow:ellipsis}.num{text-align:center;padding:10px 7px}.calc{font-weight:850;text-align:right}.good{color:var(--good)}.bad{color:var(--bad)}.totals{display:grid;gap:8px}.total-row{display:flex;justify-content:space-between;align-items:center;background:#151032;border:1px solid #30275a;border-radius:14px;padding:11px 13px}.total-row.leader{border-color:var(--gold);box-shadow:0 0 0 1px rgba(246,201,74,.18) inset}.total-points{font-size:21px;font-weight:900}.install-box{background:linear-gradient(135deg,rgba(118,88,255,.24),rgba(246,201,74,.12));border-color:#5948a0}.small{font-size:12px;color:var(--muted);line-height:1.45}.notice{padding:11px 13px;border-radius:13px;background:#261c4f;border:1px solid #493c78;color:#d8d2e9;font-size:13px}.empty{text-align:center;color:var(--muted);padding:14px 0}.footer{text-align:center;color:#777091;font-size:11px;padding:14px}.toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;background:#fff;color:#17103a;padding:11px 15px;border-radius:12px;font-weight:700;box-shadow:0 12px 30px rgba(0,0,0,.35);transition:.2s;z-index:5}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+    @media(max-width:560px){.wrap{padding:10px 10px 28px}.hero h1{font-size:26px}.card{padding:15px;border-radius:18px}.row{flex-direction:column}.row .btn{width:100%}.actions.two{grid-template-columns:1fr}.score-row{grid-template-columns:1.15fr .65fr .65fr .7fr;font-size:13px}.score-row.head{font-size:9px}.num{padding:9px 3px}.total-points{font-size:19px}}
+  </style>
 </head>
 <body>
 <div class="wrap">
-<header>
-  <h1>🧙 Wizard Punkte</h1>
-  <div class="subtitle">Einfach Ansage und Stiche eintragen – die Punkte werden automatisch berechnet.</div>
-</header>
+  <header class="hero">
+    <img class="logo" src="icon-192.png" alt="Wizard">
+    <h1>🧙 Wizard Punkte</h1>
+    <p>Ansagen eintragen · Stiche eintragen · Punkte automatisch berechnen</p>
+  </header>
 
-<section class="card" id="setup">
-  <h2>Spieler</h2>
-  <div class="row">
-    <input id="newPlayer" type="text" placeholder="Name des Spielers" style="max-width:360px">
-    <button class="primary" onclick="addPlayer()">Spieler hinzufügen</button>
-  </div>
-  <div id="playerList" class="players"></div>
-  <p class="hint">Normale Wizard-Wertung: richtige Ansage = 20 + 10 Punkte je Stich. Falsche Ansage = −10 Punkte je Stich Abweichung.</p>
-  <button id="startBtn" class="primary" onclick="startGame()" disabled>Spiel starten</button>
-</section>
-
-<section class="card hidden" id="game">
-  <div class="round-head">
-    <div>
-      <h2 id="roundTitle" style="margin:0"></h2>
-      <div class="hint" id="roundHint"></div>
-    </div>
+  <section id="setup" class="card">
+    <h2>Spieler</h2>
+    <div class="sub">3–6 Spieler · Namen hinzufügen und anschließend das Spiel starten.</div>
     <div class="row">
-      <button class="secondary small" onclick="undoRound()">↩ Letzte Runde</button>
-      <button class="danger small" onclick="newGame()">Neues Spiel</button>
+      <input id="nameInput" class="input name-input" type="text" maxlength="24" placeholder="Name des Spielers" autocomplete="off">
+      <button id="addBtn" class="btn secondary">Spieler hinzufügen</button>
     </div>
-  </div>
-
-  <div class="card" style="margin:14px 0;background:#fafafa">
-    <h3 style="margin-top:0">Runde eintragen</h3>
-    <div id="entries" class="entry-grid"></div>
-    <div class="row" style="margin-top:14px">
-      <button class="primary" onclick="saveRound()">Runde speichern</button>
+    <div id="playerList" class="players"></div>
+    <div id="setupMessage" class="small" style="margin-top:10px"></div>
+    <div class="actions">
+      <button id="startBtn" class="btn primary">Spiel starten</button>
     </div>
-  </div>
+  </section>
 
-  <div class="card" style="margin:14px 0">
-    <h3 style="margin-top:0">Gesamtstand</h3>
-    <div id="totals" class="totals"></div>
-  </div>
+  <section id="game" class="hidden">
+    <div class="card">
+      <div class="round-head">
+        <div><h2 style="margin-bottom:5px">Runde eintragen</h2><div id="roundInfo" class="sub" style="margin:0"></div></div>
+        <div id="roundBadge" class="round-badge">Runde 1</div>
+      </div>
+      <div id="roundNotice" class="notice" style="margin:14px 0 12px">Alle Felder sind bewusst leer. Trage Ansage und tatsächliche Stiche ein.</div>
+      <div id="roundForm" class="score-table"></div>
+      <div class="actions two">
+        <button id="saveRoundBtn" class="btn primary">Runde speichern</button>
+        <button id="undoBtn" class="btn secondary">↩ Letzte Runde</button>
+      </div>
+      <div class="actions"><button id="newBtn" class="btn danger">Neues Spiel</button></div>
+    </div>
 
-  <div class="score-grid">
-    <table id="scoreTable"></table>
-  </div>
-  <div id="gameOver" class="card winner hidden" style="margin-top:14px"></div>
-</section>
+    <div class="card">
+      <h2>Gesamtstand</h2>
+      <div id="totals" class="totals"></div>
+    </div>
 
-<div id="installBox" class="card hidden" style="position:sticky;bottom:12px;z-index:10;background:#17103a;color:white;border-color:#7c3aed"><div class="row" style="justify-content:space-between"><div><strong>📱 Wizard Punkte installieren</strong><div style="opacity:.8;font-size:.9rem">App auf dem Startbildschirm installieren.</div></div><button id="installBtn" class="primary">Installieren</button></div></div><footer>Wizard Punkte – funktioniert direkt im Browser und speichert den Spielstand auf diesem Gerät.</footer>
+    <div class="card install-box" id="installBox">
+      <h2>📱 Wizard Punkte installieren</h2>
+      <div class="small" style="margin-bottom:12px">Installiere die App auf dem Startbildschirm. Sie öffnet sich danach wie eine normale App.</div>
+      <button id="installBtn" class="btn install">Installieren</button>
+      <div id="installHint" class="small" style="margin-top:9px"></div>
+    </div>
+  </section>
+
+  <div class="footer">Wizard Punkte · funktioniert im Browser und speichert den Spielstand auf diesem Gerät.</div>
 </div>
-
+<div id="toast" class="toast"></div>
 <script>
-let state = { players: [], rounds: [], currentRound: 1 };
-
-function load() {
-  try {
-    const saved = localStorage.getItem('wizardScore');
-    if (saved) state = JSON.parse(saved);
-  } catch(e) {}
-  render();
-}
-function persist(){ localStorage.setItem('wizardScore', JSON.stringify(state)); }
-
-function addPlayer() {
-  const input=document.getElementById('newPlayer');
-  const name=input.value.trim();
-  if(!name) return;
-  if(state.players.length>=6){ alert('Wizard kann mit maximal 6 Spielern gespielt werden.'); return; }
-  state.players.push(name);
-  input.value='';
+(() => {
+  const KEY='wizard-punkte-v3-state';
+  let state=load() || {players:[],rounds:[]};
+  let deferredPrompt=null;
+  const $=id=>document.getElementById(id);
+  const esc=s=>String(s).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+  function load(){try{return JSON.parse(localStorage.getItem(KEY))}catch{return null}}
+  function save(){localStorage.setItem(KEY,JSON.stringify(state))}
+  function roundsMax(){return state.players.length?Math.floor(60/state.players.length):0}
+  function showToast(t){const el=$('toast');el.textContent=t;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),1800)}
+  function renderSetup(){
+    $('playerList').innerHTML=state.players.map((p,i)=>`<div class="player-row"><span>${esc(p)}</span><button class="remove" data-i="${i}" aria-label="Spieler entfernen">✕</button></div>`).join('') || '<div class="empty">Noch keine Spieler hinzugefügt.</div>';
+    $('addBtn').disabled=state.players.length>=6;
+    $('setupMessage').textContent=state.players.length<3?'Mindestens 3 Spieler werden für Wizard benötigt.':`${state.players.length} Spieler · maximal ${roundsMax()} Runden.`;
+    document.querySelectorAll('.remove').forEach(b=>b.onclick=()=>{state.players.splice(Number(b.dataset.i),1);state.rounds=[];save();renderSetup()});
+  }
+  function totals(){return state.players.map((name,i)=>({name,total:state.rounds.reduce((sum,r)=>sum+(r.scores[i]??0),0)}))}
+  function renderTotals(){
+    const ts=totals(); const max=Math.max(...ts.map(x=>x.total),-Infinity);
+    $('totals').innerHTML=ts.map(x=>`<div class="total-row ${x.total===max?'leader':''}"><span><b>${esc(x.name)}</b>${x.total===max?' 👑':''}</span><span class="total-points">${x.total}</span></div>`).join('');
+  }
+  function renderRound(){
+    const r=state.rounds.length+1, max=roundsMax();
+    $('roundBadge').textContent=`Runde ${r}`;
+    $('roundInfo').textContent=max?`von ${max} möglichen Runden · Standardwertung`:'';
+    $('roundForm').innerHTML=state.players.map((p,i)=>`<div class="score-row"><div class="pname">${esc(p)}</div><input class="num bid" data-i="${i}" type="number" min="0" max="${r}" step="1" inputmode="numeric" placeholder="Ansage" aria-label="Ansage ${esc(p)}"><input class="num tricks" data-i="${i}" type="number" min="0" max="${r}" step="1" inputmode="numeric" placeholder="Stiche" aria-label="Stiche ${esc(p)}"><div class="calc" data-calc="${i}">—</div></div>`).join('')+
+      `<div class="score-row head"><div>Spieler</div><div>Ansage</div><div>Stiche</div><div>Punkte</div></div>`;
+    // header is intentionally shown last in DOM on mobile? Move it to top for visual order.
+    const form=$('roundForm'), head=form.lastElementChild; form.insertBefore(head,form.firstElementChild);
+    document.querySelectorAll('.bid,.tricks').forEach(inp=>inp.addEventListener('input',preview));
+    $('saveRoundBtn').disabled=false;
+    $('undoBtn').disabled=state.rounds.length===0;
+    if(state.rounds.length>=max && max>0){$('saveRoundBtn').disabled=true;$('roundNotice').textContent='Alle vorgesehenen Runden sind gespielt.'}
+  }
+  function preview(){
+    state.players.forEach((_,i)=>{
+      const b=document.querySelector(`.bid[data-i="${i}"]`), t=document.querySelector(`.tricks[data-i="${i}"]`), c=document.querySelector(`[data-calc="${i}"]`);
+      if(!b||!t||b.value===''||t.value===''){c.textContent='—';c.className='calc';return}
+      const bid=Number(b.value),tr=Number(t.value),pts=bid===tr?20+10*tr:-10*Math.abs(bid-tr);c.textContent=pts>0?`+${pts}`:pts;c.className='calc '+(pts>=0?'good':'bad');
+    });
+  }
+  function start(){
+    if(state.players.length<3||state.players.length>6){showToast('Bitte 3–6 Spieler hinzufügen.');return}
+    state.rounds=[];save();$('setup').classList.add('hidden');$('game').classList.remove('hidden');renderRound();renderTotals();window.scrollTo({top:0,behavior:'smooth'});
+  }
+  function saveRound(){
+    const bids=[...document.querySelectorAll('.bid')], tricks=[...document.querySelectorAll('.tricks')];
+    if(bids.some(x=>x.value==='')||tricks.some(x=>x.value==='')){showToast('Bitte bei allen Spielern Ansage und Stiche eintragen.');return}
+    const r=state.rounds.length+1, scores=[];
+    for(let i=0;i<state.players.length;i++){
+      const bid=Number(bids[i].value),tr=Number(tricks[i].value);
+      if(!Number.isInteger(bid)||!Number.isInteger(tr)||bid<0||tr<0||bid>r||tr>r){showToast('Ansage und Stiche müssen gültige Werte sein.');return}
+      scores.push(bid===tr?20+10*tr:-10*Math.abs(bid-tr));
+    }
+    state.rounds.push({scores});save();showToast(`Runde ${r} gespeichert.`);
+    if(state.rounds.length>=roundsMax()){$('roundNotice').textContent='Das Spiel ist beendet – Glückwunsch an den Gewinner!';}
+    renderRound();renderTotals();
+  }
+  function undo(){if(!state.rounds.length){showToast('Es gibt noch keine Runde zum Zurücknehmen.');return}state.rounds.pop();save();renderRound();renderTotals();showToast('Letzte Runde zurückgenommen.')}
+  function newGame(){if(!confirm('Wirklich ein neues Spiel starten? Der aktuelle Spielstand wird gelöscht.'))return;state={players:[],rounds:[]};save();$('game').classList.add('hidden');$('setup').classList.remove('hidden');renderSetup();window.scrollTo({top:0,behavior:'smooth'})}
+  $('addBtn').onclick=()=>{const v=$('nameInput').value.trim();if(!v)return;if(state.players.length>=6){showToast('Maximal 6 Spieler.');return}if(state.players.some(p=>p.toLowerCase()===v.toLowerCase())){showToast('Diesen Namen gibt es schon.');return}state.players.push(v);$('nameInput').value='';save();renderSetup();$('nameInput').focus()};
+  $('nameInput').addEventListener('keydown',e=>{if(e.key==='Enter')$('addBtn').click()});$('startBtn').onclick=start;$('saveRoundBtn').onclick=saveRound;$('undoBtn').onclick=undo;$('newBtn').onclick=newGame;
+  window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;$('installHint').textContent='Installation ist auf diesem Gerät verfügbar.'});
+  $('installBtn').onclick=async()=>{if(deferredPrompt){deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null;return} $('installHint').textContent='Falls keine Installationsabfrage erscheint: im Browser-Menü „App installieren“ oder „Zum Startbildschirm hinzufügen“ wählen.'};
+  window.addEventListener('appinstalled',()=>{$('installBox').classList.add('hidden')});
+  if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{});
   renderSetup();
-}
-function removePlayer(i) {
-  if(state.rounds.length){ alert('Während eines Spiels können Spieler nicht entfernt werden. Starte ein neues Spiel.'); return; }
-  state.players.splice(i,1); renderSetup();
-}
-function renderSetup(){
-  const list=document.getElementById('playerList');
-  list.innerHTML=state.players.map((p,i)=>`<div class="player-edit"><input value="${esc(p)}" onchange="renamePlayer(${i},this.value)"><button class="danger small" onclick="removePlayer(${i})">✕</button></div>`).join('');
-  document.getElementById('startBtn').disabled=state.players.length<3 || state.players.length>6;
-}
-function renamePlayer(i,v){ if(v.trim()) state.players[i]=v.trim(); persist(); render(); }
-function maxRounds(){ return Math.floor(60/state.players.length); }
-
-function startGame(){
-  if(state.players.length<3 || state.players.length>6) return;
-  state.rounds=[]; state.currentRound=1; persist(); renderGame();
-}
-function newGame(){
-  if(!confirm('Neues Spiel starten? Der aktuelle Spielstand wird gelöscht.')) return;
-  state={players:[],rounds:[],currentRound:1};
-  persist(); render();
-}
-function score(bid,tricks){
-  const diff=tricks-bid;
-  return diff===0 ? 20 + 10*bid : -10*Math.abs(diff);
-}
-function saveRound(){
-  const r=state.currentRound;
-  const max=r;
-  const values=state.players.map((p,i)=>{
-    const bid=Number(document.getElementById('bid'+i).value);
-    const tricks=Number(document.getElementById('tricks'+i).value);
-    return {bid,tricks,points:score(bid,tricks)};
-  });
-  const totalTricks=values.reduce((a,x)=>a+x.tricks,0);
-  if(values.some(x=>!Number.isInteger(x.bid)||!Number.isInteger(x.tricks)||x.bid<0||x.bid>max||x.tricks<0||x.tricks>max)){
-    alert(`Bitte nur ganze Zahlen von 0 bis ${max} eingeben.`); return;
-  }
-  if(totalTricks!==r){
-    alert(`In Runde ${r} müssen insgesamt genau ${r} Stiche eingetragen werden. Aktuell: ${totalTricks}.`);
-    return;
-  }
-  state.rounds.push(values); state.currentRound++;
-  persist(); renderGame();
-}
-function undoRound(){
-  if(!state.rounds.length){ alert('Es gibt noch keine gespeicherte Runde.'); return; }
-  state.rounds.pop(); state.currentRound=Math.max(1,state.currentRound-1); persist(); renderGame();
-}
-function totals(){
-  return state.players.map((p,i)=>state.rounds.reduce((sum,r)=>sum+r[i].points,0));
-}
-function renderGame(){
-  document.getElementById('setup').classList.add('hidden');
-  document.getElementById('game').classList.remove('hidden');
-  const max=maxRounds();
-  document.getElementById('roundTitle').textContent = state.currentRound<=max ? `Runde ${state.currentRound} von ${max}` : 'Spiel beendet';
-  document.getElementById('roundHint').textContent = state.currentRound<=max ? `In dieser Runde werden ${state.currentRound} Karten/Stiche gespielt.` : 'Alle Runden sind abgeschlossen.';
-  const entries=document.getElementById('entries');
-  if(state.currentRound<=max){
-    entries.innerHTML=state.players.map((p,i)=>`
-      <div class="entry">
-        <strong>${esc(p)}</strong>
-        <div class="fields">
-          <label>Ansage<input id="bid${i}" type="number" min="0" max="${state.currentRound}" value="0"></label>
-          <label>Stiche<input id="tricks${i}" type="number" min="0" max="${state.currentRound}" value="0"></label>
-        </div>
-      </div>`).join('');
-  } else {
-    entries.innerHTML='<p class="hint">Keine weitere Runde vorhanden.</p>';
-  }
-  renderTotals(); renderTable();
-  const over=document.getElementById('gameOver');
-  if(state.currentRound>max){
-    const ts=totals(), best=Math.max(...ts), winners=state.players.filter((p,i)=>ts[i]===best);
-    over.classList.remove('hidden');
-    over.innerHTML=`🏆 <strong>Gewonnen:</strong> ${winners.map(esc).join(' & ')} mit <strong>${best} Punkten</strong>.`;
-  } else over.classList.add('hidden');
-}
-function renderTotals(){
-  const ts=totals(), best=ts.length?Math.max(...ts):0;
-  document.getElementById('totals').innerHTML=state.players.map((p,i)=>`
-    <div class="total ${ts[i]===best&&state.rounds.length?'winner':''}">
-      <div class="name">${esc(p)}</div><div class="points">${ts[i]}</div>
-    </div>`).join('');
-}
-function renderTable(){
-  let html='<thead><tr><th>Runde</th>'+state.players.map(esc).map(p=>`<th>${p}</th>`).join('')+'</tr></thead><tbody>';
-  state.rounds.forEach((r,ri)=>{
-    html+=`<tr><td>${ri+1}</td>`+r.map(x=>`<td>${x.points > 0 ? '+' : ''}${x.points}<br><span class="hint">${x.bid} / ${x.tricks}</span></td>`).join('')+'</tr>';
-  });
-  if(state.rounds.length) html+=`<tr><th>Gesamt</th>${totals().map(x=>`<th>${x}</th>`).join('')}</tr>`;
-  html+='</tbody>';
-  document.getElementById('scoreTable').innerHTML=html;
-}
-function render(){
-  if(state.rounds.length || state.currentRound>1) renderGame();
-  else { document.getElementById('setup').classList.remove('hidden'); document.getElementById('game').classList.add('hidden'); renderSetup(); }
-}
-function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-document.getElementById('newPlayer').addEventListener('keydown',e=>{if(e.key==='Enter')addPlayer();});
-load();
+  if(state.players.length>=3){$('setup').classList.add('hidden');$('game').classList.remove('hidden');renderRound();renderTotals()}
+})();
 </script>
-<script>
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(()=>{}));
-}
-</script>
-<script>
-let deferredInstallPrompt=null;
-const installBox=document.getElementById("installBox"), installBtn=document.getElementById("installBtn");
-window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredInstallPrompt=e;if(installBox)installBox.classList.remove("hidden")});
-if(installBtn)installBtn.addEventListener("click",async()=>{if(!deferredInstallPrompt)return;deferredInstallPrompt.prompt();await deferredInstallPrompt.userChoice;deferredInstallPrompt=null;installBox.classList.add("hidden")});
-window.addEventListener("appinstalled",()=>{deferredInstallPrompt=null;if(installBox)installBox.classList.add("hidden")});
-if("serviceWorker"in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js",{scope:"./"}).catch(console.error));
-</script></body>
+</body>
 </html>
